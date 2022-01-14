@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import { run, css } from './util/run'
+import { run, html, css } from './util/run'
 
 test('prefix', () => {
   let config = {
@@ -72,4 +72,94 @@ test('prefix', () => {
 
     expect(result.css).toMatchFormattedCss(expected)
   })
+})
+
+fit('prefix with negative values', async () => {
+  let config = {
+    prefix: 'tw-',
+    content: [{ raw: html`<div class="-tw-top-1"></div>` }],
+    corePlugins: { preflight: false },
+  }
+
+  let input = css`
+    @tailwind utilities;
+  `
+
+  await run(input, config)
+
+  const result = await run(input, config)
+
+  expect(result.css).toMatchFormattedCss(css`
+    .-tw-top-1 {
+      top: -0.25rem;
+    }
+  `)
+})
+
+fit('prefix with negative values in the safelist', async () => {
+  let config = {
+    prefix: 'tw-',
+    safelist: [
+      { pattern: /-tw-top-1/ },
+      { pattern: /tw--top-1/ },
+    ],
+    theme: {
+      inset: {
+        1: '0.25rem',
+      },
+    },
+    content: [{ raw: html`` }],
+    corePlugins: { preflight: false },
+  }
+
+  let input = css`
+    @tailwind utilities;
+  `
+
+  await run(input, config)
+
+  const result = await run(input, config)
+
+  expect(result.css).toMatchFormattedCss(css`
+    .-tw-top-1 {
+      top: -0.25rem;
+    }
+    .tw--top-1 {
+      top: -0.25rem;
+    }
+  `)
+})
+
+fit('prefix with negative values and variants in the safelist', async () => {
+  let config = {
+    prefix: 'tw-',
+    safelist: [
+      { pattern: /-tw-top-1/, variants: ['hover', 'sm:hover'] },
+      { pattern: /tw--top-1/, variants: ['hover', 'sm:hover'] },
+    ],
+    theme: {
+      inset: {
+        1: '0.25rem',
+      },
+    },
+    content: [{ raw: html`` }],
+    corePlugins: { preflight: false },
+  }
+
+  let input = css`
+    @tailwind utilities;
+  `
+
+  await run(input, config)
+
+  const result = await run(input, config)
+
+  expect(result.css).toMatchFormattedCss(css`
+    .-tw-top-1 {
+      top: -0.25rem;
+    }
+    .tw--top-1 {
+      top: -0.25rem;
+    }
+  `)
 })
