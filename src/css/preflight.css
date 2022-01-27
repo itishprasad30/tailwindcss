@@ -64,6 +64,7 @@ abbr:where([title]) {
 
 /*
 Remove the default font size and weight for headings.
+headings are important for this
 */
 
 h1,
@@ -261,7 +262,7 @@ summary {
 /*
 Removes the default spacing and border for appropriate elements.
 */
-
+dt,
 blockquote,
 dl,
 dd,
@@ -353,7 +354,7 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
 */
 
 img,
-video {
+video,canvas {
   max-width: 100%;
   height: auto;
 }
